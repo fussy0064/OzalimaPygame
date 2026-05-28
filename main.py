@@ -1,9 +1,3 @@
-"""
-MoneyCollector — Pygame arcade game
-Character: Ozalima
-Goal: Collect falling notes (+10 score). Avoid coins (lose 1 life, -5 score).
-Win: Collect 75 notes. Lose: Run out of 3 lives.
-"""
 
 from __future__ import annotations
 
@@ -95,8 +89,7 @@ def build_note_surface(size: tuple[int,int]) -> pygame.Surface:
     pygame.draw.circle(surf, (232, 255, 245), (w//2, h//2), min(w,h)//5, 2)
     pygame.draw.line(surf, (232, 255, 245), (inner.left+4, inner.centery), (inner.right-4, inner.centery), 2)
     return surf
-
-
+ #Ozalima Drowings
 def build_woman_surface(size: tuple[int,int]) -> pygame.Surface:
     """Draw the Ozalima character programmatically."""
     w, h = size
@@ -125,7 +118,6 @@ def build_woman_surface(size: tuple[int,int]) -> pygame.Surface:
     pygame.draw.circle(surf, (48, 58, 76), (cx+17, 117), 5)             # right shoe
     pygame.draw.polygon(surf, (42, 30, 56), [(cx-27,94),(cx+27,94),(cx,125)], 2) # skirt hem
     return surf
-
 
 # ── Background drawing ────────────────────────────────────────────────────────
 """def draw_background(surface: pygame.Surface, t: float) -> None:
@@ -382,16 +374,7 @@ class Note(FallingObject):
 
 # Core game manager
 class GameManager:
-    """
-    Owns everything: window, clock, assets, game state, and the main loop.
-
-    Game Flow
-    ---------
-    Level 1 → Level 2 (25 notes) → Level 3 (50 notes) → Win (75 notes)
-    Each level increases fall speed via level_speed_bonus.
-    Lives start at 3; hitting zero triggers "Ozalima Die" game-over.
-    """
-
+   
     def __init__(self) -> None:
         pygame.init()
         pygame.display.set_caption("MoneyCollector")
@@ -422,7 +405,7 @@ class GameManager:
 
     def _load_background_image(self) -> pygame.Surface:
         """Load the background image after the display is initialized."""
-        background_path = BASE_DIR / "background.jpeg"
+        background_path = BASE_DIR / "assets/background.jpeg"
         if background_path.exists():
             try:
                 image = pygame.image.load(str(background_path)).convert()
@@ -466,17 +449,14 @@ class GameManager:
 
     # Difficulty
     def get_difficulty(self) -> float:
-        """
-        Linearly grows with time.
-        Used to increase fall speed and spawn rate.
-        """
-        return self.elapsed / 14.0
+         
+         #increase fall speed and spawn rate.
+         return self.elapsed / 14.0
 
-    # Spawning 
+    # Spawning Coin or Note at a random x position above the screen
     def spawn_object(self) -> None:
-        """Create one Coin or Note at a random x position above the screen."""
         difficulty = self.get_difficulty()
-        x     = random.randint(48, SCREEN_WIDTH - 48)
+        x = random.randint(48, SCREEN_WIDTH - 48)
         speed = 150 + self.level_speed_bonus * 12 + difficulty * 14 + random.uniform(0, 48)
 
         if random.random() < 0.55:
@@ -484,19 +464,15 @@ class GameManager:
         else:
             self.objects.append(Note(self.assets["note"], x, -48, speed + 6))  # notes fall a bit faster
 
-    # Level progression 
+    # Level Update
     def update_level_state(self) -> None:
-        """
-        Promote Ozalima to the next level based on notes_collected.
-        Thresholds: 25 → L2 | 50 → L3 | 75 → Win
-        """
         prev = self.level
 
         if self.notes_collected >= 75:
             self.level, self.level_speed_bonus = 3, 6
             if not self.won:
                 self.won = self.game_over = True
-                self._show_banner("Level 3 Won", 2.0)
+                self._show_banner("Ozalima Won", 2.0)
 
         elif self.notes_collected >= 50:
             self.level, self.level_speed_bonus, self.won = 3, 4, False
@@ -518,11 +494,7 @@ class GameManager:
 
     # Collection logic 
     def apply_collection(self, obj: FallingObject) -> None:
-        """
-        Called when the player touches a falling object.
-        Note  → +10 score, green burst, screen flash, level-up check.
-        Coin  → -5 score, lose 1 life, red burst, screen shake (or game-over).
-        """
+        
         if obj.kind == "note":
             self.score           += 10
             self.notes_collected += 1
@@ -545,14 +517,14 @@ class GameManager:
                 print("Ozalima Die")
 
     def _spawn_burst(self, pos: pygame.Vector2, color: tuple[int,int,int]) -> None:
-        """Emit 10 particles in random directions from pos."""
+       
         for _ in range(10):
             angle = random.uniform(0.0, math.tau)
             speed = random.uniform(70.0, 240.0)
             vel   = pygame.Vector2(math.cos(angle) * speed, math.sin(angle) * speed - 90)
             self.particles.append(Particle(pygame.Vector2(pos), vel, color, random.uniform(2.0, 4.0), 0.55))
 
-    # Event handling
+    # Keyboard Functions
     def handle_events(self) -> bool:
         """Process input events. Returns False to quit."""
         for event in pygame.event.get():
@@ -567,9 +539,9 @@ class GameManager:
                     self.reset_game()
         return True
 
-    # Update 
+    # Main Game Update 
     def update(self, dt: float) -> None:
-        """Main update. Skips gameplay logic when paused or game-over."""
+        
         if self.paused or self.game_over:
             self._update_effects(dt)
             return
