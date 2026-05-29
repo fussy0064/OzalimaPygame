@@ -296,12 +296,9 @@ class GameManager:
     # Asset loading 
     def _load_assets(self) -> dict[str, pygame.Surface]:
         return {
-            "woman": try_load_image(["assets/woman.png"],
-                                    build_woman_surface((104,124)), (104,124)),
-            "coin":  try_load_image(["assets/coin.png", "assets/coin1.png"],
-                                    build_coin_surface((52,52)),  (52,52)),
-            "note":  try_load_image(["assets/note.jpeg", "assets/Note1.png"],
-                                    build_note_surface((82,58)),  (82,58)),
+        "woman": build_woman_surface((104, 124)),
+        "coin":  build_coin_surface((52, 52)),
+        "note":  build_note_surface((82, 58)),
         }
 
     def _load_background_image(self) -> pygame.Surface:
